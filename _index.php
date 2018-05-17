@@ -1,8 +1,4 @@
 <?php
-// special CM files
-const _INDEX  = '_index.cm';    // index files
-const _PROLOG = '_prolog';      // prolog files
-const _TOC_JS = 'toc_.js';      // precompiled TOC
 
 $pages = $book['pages'];
 
@@ -75,7 +71,7 @@ $cacheBuster = @filectime('index.php');
   // fetch prologs + page text
   $path = ''; $pageText = ''; $pos = -1;
   for (;;) {
-    if (($prolog = @file_get_contents($pages.$path._PROLOG)))
+    if (($prolog = @file_get_contents($pages.$path.'_prolog')))
       $pageText .= $prolog."\n";
     if (false === ($pos = strpos($pagePath, '/', $pos+1)))
       break;
