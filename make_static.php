@@ -59,7 +59,7 @@ HEREDOC
 $pages = $book['pages'];
 $outdir = $pages; // static .html side-by-side with .cm
 
-saveIndex($book, 'index.html', $pages);
+saveIndex($book, 'static_index.html', $pages);
 
 (new StaticCompiler($pages, $pages))->compile();
 // eof

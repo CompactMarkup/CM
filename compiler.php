@@ -9,9 +9,10 @@ class Compiler {
   protected $pages;
   protected $outdir;
 
-  public function __construct ($pages, $outdir) {
+  public function __construct ($pages, $outdir, $static = false) {
     $this->pages  = $pages;
     $this->outdir = $outdir;
+    $this->static = $static;
     $this->isDebug = isset($_SERVER['SERVER_PORT']) && (8000 <= $_SERVER['SERVER_PORT']);
   }
 
@@ -107,18 +108,19 @@ class Compiler {
       if (is_dir($cwd.$fd)) {
         $this->traverse($indNo, $path.$fd.'/', $i, $level + 1);
       } else {
-        list($id, $cl, $title) = $this->getTocLine($cwd.$fd);
-        ++$i;
-        self::checkUniqueId($id);
-        $pf = $this->processFile($title, $path, $fd, substr($fd, 0, -3) . '.html', $level);
+        if ('.cm' == substr($fd, -3) || (!$this->static && '.php' == substr($fd, -4))) {
+          list($id, $cl, $title) = $this->getTocLine($cwd.$fd);
+          ++$i;
+          self::checkUniqueId($id);
+          $pf = $this->processFile($title, $path, $fd, substr($fd, 0, -3) . '.html', $level);
 
-        $this->lst .= "['$id','$pf','".htmlentities($title)."'],";
-        $this->cls .= "'$cl',";
-        $this->ids .= "'$id':$i,";
-        $this->sec .= "$i:$indNo,";
-        $this->pnt .= "$i:$indNo,";
-        $this->fil .= "'$pf':$i,";
-
+          $this->lst .= "['$id','$pf','".htmlentities($title)."'],";
+          $this->cls .= "'$cl',";
+          $this->ids .= "'$id':$i,";
+          $this->sec .= "$i:$indNo,";
+          $this->pnt .= "$i:$indNo,";
+          $this->fil .= "'$pf':$i,";
+        }
       }
     }
   }
@@ -166,7 +168,7 @@ class TocCompiler extends Compiler {
 
 class StaticCompiler extends Compiler {
   public function __construct ($pages, $outdir) {
-    Compiler::__construct($pages, $outdir);
+    Compiler::__construct($pages, $outdir, true);
   }
 
   function saveHtml ($title, $relPath, $outFile, $tx, $level) {
